@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 	"time"
+	"encoding/json"
 )
 
 // Create a struct that holds information to be displayed in our HTML file
@@ -12,6 +13,13 @@ type Welcome struct {
 	Name string
 	Time string
 }
+
+
+type JsonResponse struct{
+	Value1 string 'json:"key1"'
+	Value2 string 'json:"key2"'
+}
+
 
 // Go application entrypoint
 func main() {
@@ -23,6 +31,13 @@ func main() {
 	// the relative path). We wrap it in a call to template.Must() which handles any errors and halts if there are fatal errors
 
 	templates := template.Must(template.ParseFiles("templates/welcome-template.html"))
+	jsonResp  := JsonResponse{
+		Value1 string "Some Data",
+		Value2 string "Other Data",
+
+	}
+
+
 
 	//Our HTML comes with CSS that go needs to provide when we run the app. Here we tell go to create
 	// a handle that looks in the static directory, go then uses the "/static/" as a url that our
@@ -37,6 +52,7 @@ func main() {
 
 	//This method takes in the URL path "/" and a function that takes in a response writer, and a http request.
 	// **** THIS IS THE MAIN PATH /
+	
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 
 		//****** This is the main path/
@@ -51,8 +67,22 @@ func main() {
 		}
 	})
 
-	//Start the web server, set the port to listen to 8080. Without a path it assumes localhost
-	//Print any errors from starting the webserver using fmt
+	http.HandleFunc("/jsonResponse", func(w http.ResponseWriter, r=http.Request)){
+		if name := r.FormValue("name"); name != "" {
+			welcome.name = name	
+		}
+
+		if err := template.ExecuteTemplate(w, "welcome=template.html",welcome); err != nil {
+			http.Error(w, error.Error(), http.StatusInternalServerError)
+		}
+	
+		
+	})
+	 
+	http.HandleFunc("/jsonResponse", func(w http.ResponseWriter, r=http.Request)){
+		fmt.Fprint(w,"JSON goes here")
+	})
+
 	fmt.Println("Listening")
 	fmt.Println(http.ListenAndServe(":8080", nil))
 }
