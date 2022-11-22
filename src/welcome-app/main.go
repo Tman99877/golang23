@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 )
 
-// Create a struct that holds information to be displayed in our HTML file
+
 type Welcome struct {
 	Name string
 	Time string
@@ -16,58 +16,41 @@ type Welcome struct {
 
 
 type JsonResponse struct{
-	Value1 string 'json:"key1"'
-	Value2 string 'json:"key2"'
+	Value1 string `json:"key1"`
+	Value2 string `json:"key2"`
 }
 
 
-// Go application entrypoint
+
 func main() {
-	//Instantiate a Welcome struct object and pass in some random information.
-	//We shall get the name of the user as a query parameter from the URL
+
 	welcome := Welcome{"Anonymous", time.Now().Format(time.Stamp)}
-
-	//We tell Go exactly where we can find our html file. We ask Go to parse the html file (Notice
-	// the relative path). We wrap it in a call to template.Must() which handles any errors and halts if there are fatal errors
-
 	templates := template.Must(template.ParseFiles("templates/welcome-template.html"))
 	jsonResp  := JsonResponse{
-		Value1 string "Some Data",
-		Value2 string "Other Data",
+		Value1:  "Some Data",
+		Value2: "Other Data",
 
 	}
 
 
-
-	//Our HTML comes with CSS that go needs to provide when we run the app. Here we tell go to create
-	// a handle that looks in the static directory, go then uses the "/static/" as a url that our
-	//html can refer to when looking for our css and other files.
-
-	http.Handle("/static/", //final url can be anything
+	http.Handle("/static/", 
 		http.StripPrefix("/static/",
-			http.FileServer(http.Dir("static")))) //Go looks in the relative "static" directory first using http.FileServer(), then matches it to a
-	//url of our choice as shown in http.Handle("/static/"). This url is what we need when referencing our css files
-	//once the server begins. Our html code would therefore be <link rel="stylesheet"  href="/static/stylesheet/...">
-	//It is important to note the url in http.Handle can be whatever we like, so long as we are consistent.
-
-	//This method takes in the URL path "/" and a function that takes in a response writer, and a http request.
-	// **** THIS IS THE MAIN PATH /
+			http.FileServer(http.Dir("static")))) 
 	
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request)) 
 
-		//****** This is the main path/
-		//Takes the name from the URL query e.g ?name=Martin, will set welcome.Name = Martin.
+	
 		if name := r.FormValue("name"); name != "" {
 			welcome.Name = name
 		}
-		//If errors show an internal server error message
-		//I also pass the welcome struct to the welcome-template.html file.
+		
 		if err := templates.ExecuteTemplate(w, "welcome-template.html", welcome); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-	})
+	}
 
-	http.HandleFunc("/jsonResponse", func(w http.ResponseWriter, r=http.Request)){
+	http.HandleFunc("/jsonResponse", func(w http.ResponseWriter, r*http.Request)){
 		if name := r.FormValue("name"); name != "" {
 			welcome.name = name	
 		}
@@ -77,11 +60,11 @@ func main() {
 		}
 	
 		
-	})
+	}
 	 
-	http.HandleFunc("/jsonResponse", func(w http.ResponseWriter, r=http.Request)){
-		fmt.Fprint(w,"JSON goes here")
-	})
+	http.HandleFunc("/jsonResponse", func(w http.ResponseWriter, r *http.Request)){
+		json.NewEncoder(w).Encode(jsonResp)
+	}
 
 	fmt.Println("Listening")
 	fmt.Println(http.ListenAndServe(":8080", nil))
