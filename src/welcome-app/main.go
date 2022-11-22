@@ -50,17 +50,7 @@ func main() {
 		}
 	}
 
-	http.HandleFunc("/jsonResponse", func(w http.ResponseWriter, r*http.Request)){
-		if name := r.FormValue("name"); name != "" {
-			welcome.name = name	
-		}
 
-		if err := template.ExecuteTemplate(w, "welcome=template.html",welcome); err != nil {
-			http.Error(w, error.Error(), http.StatusInternalServerError)
-		}
-	
-		
-	}
 	 
 	http.HandleFunc("/jsonResponse", func(w http.ResponseWriter, r *http.Request)){
 		json.NewEncoder(w).Encode(jsonResp)
