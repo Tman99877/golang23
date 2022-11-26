@@ -16,14 +16,14 @@ type Welcome struct {
 
 
 type JsonResponse struct{
-	Value1 string `json:"key1"`
-	Value2 string `json:"key2"`
-	jsonNested JsonNested `json: "JsonNested`
+	Fname string `json:"First Name"`
+	Lname string `json:"Last Name"`
+	JsonInfo JsonInfo `json: "Client  info`
 }
 
-type JsonNested struct{
-	NestedValue1 string `json"nestedKey1"`
-	NestedValue2 string `json"nestedKey2"`
+type JsonInfo struct{
+	Maddress string `json"Mailing Address"`
+	Cinfo string `json"Contact Info"`
 }
 
 
@@ -32,16 +32,16 @@ func main() {
 	welcome := Welcome{"Anonymous", time.Now().Format(time.Stamp)}
 	templates := template.Must(template.ParseFiles("templates/welcome-template.html"))
 
-	nested := JsonNested{
-		NestedValue1: "first nested value",
-		NestedValue2: "Second nested value",
+	nested := JsonInfo{
+		Maddress: "200 49th St Apt 50 Columbus,Ga 31906",
+		Cinfo: "706-999-0156, UCantCMe99@gmail.com",
 	}
 
 
 	jsonResp  := JsonResponse{
-		Value1:  "Some Data",
-		Value2: "Other Data",
-		jsonNested: nested,
+		Fname:  "John",
+		Lname: "Cena",
+		JsonInfo: nested,
 
 	}
 
@@ -58,7 +58,7 @@ func main() {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
-	http.HandleFunc("/jsonResponse", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/contactinfo", func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(jsonResp)
 	})
 	
